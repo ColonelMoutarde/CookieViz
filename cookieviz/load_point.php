@@ -1,5 +1,5 @@
 <?php
-/*Copyright (c) 2013, Stéphane Petitcolas
+/*Copyright (c) 2013, StÃ©phane Petitcolas
 This file is part of CookieViz
 
 CookieViz is free software: you can redistribute it and/or modify
@@ -21,45 +21,42 @@ require "point.php";
 
 class point_map
 {
-	var $load_query;
-	var $map;
-	var $reference;
-	var $last_date;
-	var $domain;
-	function __construct($domain, $link)
+	public $load_query;
+	public $map;
+	public $reference;
+	public $last_date;
+	public $domain;
+	
+	public	function __construct($domain, $link)
 	{
 		$this->domain = $domain;
 			$this->load_query = "SELECT * FROM url_referer GROUP BY url_domains, referer_domains, date ORDER BY date ASC";
 			$this->load($link);
 	}
 	
-	function load($link)
+	public function load($link)
 	{
 		$query = $link->prepare($this->load_query);
 		$query->execute();
 		$result = $query->get_result();
 		$i = 0;
-		while ($line = $result->fetch_assoc())
-		{
+		while ($line = $result->fetch_assoc()) {
 			if ($line["url_domains"] != "")
 			{
-				if (!isset($this->map[$line["url_domains"]]))
-				{
+				if (!isset($this->map[$line["url_domains"]])) {
 					$this->map[$line["url_domains"]] = new point($line, $i);
 					$i++;
-				}
-				else
-				{
+				} else {
 					$this->map[$line["url_domains"]]->increment($line);
 				}				
-				if (isset($line["referer_domains"]) && $line["referer_domains"] != "")
-				{
+				if (isset($line["referer_domains"]) && $line["referer_domains"] != "") {
 					$this->map[$line["url_domains"]]->add_link($line["referer_domains"], $line["is_cookie"]);
 				}
 			}
 		}
 	}
-	function get_map()
+	
+	public function get_map()
 	{
 		return $this->map;
 	}
